@@ -6,7 +6,8 @@ import torch.nn.functional as F
 from torch.nn.parameter import Parameter
 
 
-class SGF(nn.Module):
+# SGF-A in paper
+class SGF(nn.Module): 
     def __init__(self, nfeat, nlayers, nhidden, nclass, dropout):
         super(SGF, self).__init__()
         self.filters = nn.ModuleList()
@@ -32,6 +33,7 @@ class SGF(nn.Module):
         return F.log_softmax(y_hat, dim=1)
 
 
+# SGF-B in paper
 class SGFB(nn.Module):
     def __init__(self, nfeat, nlayers, nhidden, nclass, dropout):
         super(SGFB, self).__init__()
@@ -45,6 +47,7 @@ class SGFB(nn.Module):
         self.params2.extend(list(self.fc_out.parameters()))
         self.act_fn = nn.ReLU()
         self.dropout = dropout
+        self.nlayers = nlayers
 
     def forward(self, x, adj):
         x = F.dropout(x, self.dropout, training=self.training)
@@ -54,7 +57,8 @@ class SGFB(nn.Module):
         for i, filt in enumerate(self.filters):
             H_l = F.dropout(H_l, self.dropout, training=self.training)
             H_l, skip = filt(H_l, adj, H_0)
-            skip_accum += skip
+            if i < self.nlayers-1:
+                skip_accum += skip
         H_l = F.dropout(H_l+skip_accum, self.dropout, training=self.training)
         y_hat = self.fc_out(H_l)
         return F.log_softmax(y_hat, dim=1)
