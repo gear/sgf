@@ -1,18 +1,28 @@
-Source code for SGF. Requires PyTorch and CUDA 10+.
+Source code for SGF. Uses PyTorch.
 
 Create environment:
 ```
 conda install pytorch-gpu networkx scipy scikit-learn
 ```
+or this if GPU is not available
+```
+conda install pytorch networkx scipy scikit-learn
+```
 
-We can use same model for all 3 different frequency data. Remove the `--cuda` flag to train on CPU, it will be about x10 slower.
+We can use same model for all 3 different frequency data. Remove the `--cuda` flag to train on CPU, it will be about x10 slower. The default split is 0.6/0.2/0.2. Train with skip-from-input version (SGF-A):
 ```bash
 python train_sgf.py --data cora --test_study --cuda
 python train_sgf.py --data wisconsin --test_study --cuda
 python train_sgf.py --data bipartite --test_study --cuda
 ```
+or train with skip-to-output version (SGF-B):
+```bash
+python b_train_sgf.py --data cora --test_study --cuda
+python b_train_sgf.py --data wisconsin --test_study --cuda
+python b_train_sgf.py --data bipartite --test_study --cuda
+```
 
-Cora/Citeseer/Pubmed has original split.
+Cora/Citeseer/Pubmed has original split (similar to what used in the GCN paper).
 ```bash
 python train_sgf.py --data cora --original_split --test --cuda
 python train_sgf.py --data citeseer --original_split --test --cuda
