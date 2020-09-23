@@ -14,7 +14,8 @@ from utils import load_data, accuracy
 
 # Training settings
 parser = argparse.ArgumentParser()
-parser.add_argument('--seed', type=int, default=42, help='Random seed.')
+parser.add_argument('--data', default='cora', help='dateset')
+parser.add_argument('--seed', type=int, default=0, help='Random seed.')
 parser.add_argument('--epochs', type=int, default=1500, help='Number of epochs to train.')
 parser.add_argument('--lr', type=float, default=0.01, help='learning rate.')
 parser.add_argument('--wd', type=float, default=5e-4, help='weight decay (L2 loss on parameters).')
@@ -22,8 +23,8 @@ parser.add_argument('--layer', type=int, default=32, help='Number of layers.')
 parser.add_argument('--hidden', type=int, default=64, help='hidden dimensions.')
 parser.add_argument('--dropout', type=float, default=0.6, help='Dropout rate (1 - keep probability).')
 parser.add_argument('--patience', type=int, default=100, help='Patience')
-parser.add_argument('--data', default='cora', help='dateset')
-parser.add_argument('--dev', type=int, default=0, help='device id')
+parser.add_argument('--cuda', action="store_true", default=False, help='Train on CPU or GPU')
+parser.add_argument('--gpu_id', type=int, default=0, help='GPU device id')
 parser.add_argument('--test', action='store_true', default=False, help='evaluation on test set.')
 parser.add_argument('--test_study', action='store_true', default=False, help='print info on the test result.')
 parser.add_argument("--log_period", type=int, default=50, help="Log every x epochs")
@@ -49,8 +50,11 @@ est_rayleigh = rayleigh_sub(labels, L, torch.cat((idx_train, idx_val)),
                             one_hot=True) 
 ######
 
-# Setup device. TODO: CPU
-cudaid = "cuda:"+str(args.dev)
+# Setup device
+if args.cuda:
+    cudaid = "cuda:"+str(args.gpu_id)
+else:
+    cudaid = "cpu"
 device = torch.device(cudaid)
 features = features.to(device)
 adj = adj.to(device)
