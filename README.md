@@ -30,3 +30,11 @@ python train_sgf.py --data pubmed --original_split --test --cuda
 ```
 
 Note: There are 3 hyperparameter: Dropout, weight decay, learning rate, number of filter layers.
+
+We pack the data using `pickle` in the following format:
+```
+dname.graph: networkx graph
+dname.X: numpy feature matrix shape=(num_nodes, feature_dim)
+dname.y: numpy label matrix shape=(num_nodes,)
+dname.split (optional): dictionary of splits
+```
