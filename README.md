@@ -1,6 +1,6 @@
 Source code for SGF. Uses PyTorch.
 
-![](./misc/sgfa.png)
+![Block Diagram of SGF-A](https://github.com/gear/sgf/raw/master/misc/sgf.png)
 
 Create environment:
 ```
