@@ -1,5 +1,7 @@
 Source code for SGF. Uses PyTorch.
 
+![](./misc/sgfa.png)
+
 Create environment:
 ```
 conda install pytorch-gpu networkx scipy scikit-learn
