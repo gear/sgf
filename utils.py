@@ -14,6 +14,20 @@ from sklearn.model_selection import train_test_split
 
 dataf = os.path.expanduser("{}/data/".format(os.path.dirname(__file__)))
 
+def get_coeff(alphas, betas, lap=True):
+    K = len(alphas)
+    if not lap:
+        return -1
+    else:
+        coeffs = []
+        for i in range(K):
+            c = np.prod([alphas[j] for j in range(i,K)])
+            if i > 0:
+                c *= betas[i-1]
+            coeffs.append(c)
+        coeffs.append(betas[-1])
+    return coeffs
+
 def accuracy(output, labels):
     preds = output.max(1)[1].type_as(labels)
     correct = preds.eq(labels).double()

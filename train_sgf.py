@@ -2,6 +2,7 @@ import time
 import random
 import argparse
 import numpy as np
+import pickle as pkl
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
@@ -10,7 +11,7 @@ import uuid
 from collections import Counter
 from sklearn.metrics import confusion_matrix
 from rayleigh import rayleigh_quotient, rayleigh_sub
-from utils import load_data, accuracy
+from utils import load_data, accuracy, get_coeff
 
 # Training settings
 parser = argparse.ArgumentParser()
@@ -60,7 +61,10 @@ features = features.to(device)
 adj = adj.to(device)
 L = L.to(device)
 checkpt_file = 'checkpoints/'+uuid.uuid4().hex[:4]+'-'+args.data+'.pt'
+poly_file = 'checkpoints/'+uuid.uuid4().hex[:4]+'-'+args.data+'.poly'
 print(cudaid, checkpt_file)
+if args.test_study:
+    print(poly_file)
 
 model = SGF(nfeat=features.shape[1],
             nlayers=args.layer,
@@ -125,6 +129,13 @@ def test_study():
        
         for k, v in test_labels.items():
             print(k, 1 - wrong_labels[k+1]/v)
+
+        alphas = [f.alpha1.item() for f in model.filters]
+        betas = [f.alpha2.item() for f in model.filters]
+        poly_coeffs = get_coeff(alphas, betas)
+        print(poly_coeffs)
+        with open(poly_file, "wb") as f:
+            pkl.dump(poly_coeffs, f)
 
         print(confusion_matrix(labels[idx_test], preds))
 
