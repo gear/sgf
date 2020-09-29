@@ -31,6 +31,7 @@ parser.add_argument('--test_study', action='store_true', default=False, help='pr
 parser.add_argument("--log_period", type=int, default=50, help="Log every x epochs")
 parser.add_argument("--split", type=str, default="0.6_0.2_0.2")
 parser.add_argument("--use_laplacian", action="store_true", default=False)
+parser.add_argument("--perturbate_edges", type=float, default=0.0)
 args = parser.parse_args()
 random.seed(args.seed)
 np.random.seed(args.seed)
@@ -38,8 +39,15 @@ torch.manual_seed(args.seed)
 torch.cuda.manual_seed(args.seed)
 
 # Load data
-data_package = load_data(args.data, ["AugNormAdj", "SymNormLap"], 
-                         split=args.split, rs=args.seed)
+if args.perturbate_edges > 0.0:
+    print("INFO: Perturbate edges")
+    data_package = load_data(args.data, ["AugNormAdj", "SymNormLap"], 
+                             split=args.split, rs=args.seed,
+                             pf=args.perturbate_edges)
+else:
+    data_package = load_data(args.data, ["AugNormAdj", "SymNormLap"], 
+                             split=args.split, rs=args.seed)
+
 _, normed_adjs, features, labels, idx_train, idx_val, idx_test = data_package
 adj, L = normed_adjs
 if args.use_laplacian:

@@ -56,6 +56,7 @@ def load_data(dataset_str="cora",
               cuda=False,
               split="0.6",
               rs=0,
+              pf=None,
               **kwargs):
     """
     Load pickle packed datasets.
@@ -87,6 +88,8 @@ def load_data(dataset_str="cora",
                                  stratify=y, random_state=rs) 
 
     normed_adj = []
+    if pf:
+        graph = perturbate_edges(graph, pf)
     if len(normalization) > 0:
         adj = nx.adj_matrix(graph)
         for n in normalization:
@@ -149,3 +152,17 @@ def sgc_precompute(features, adj, degree):
         features = torch.spmm(adj, features)
     precompute_time = perf_counter()-t
     return features, precompute_time
+
+def perturbate_edges(g, fraction=0.1):
+    """Perturbate a fraction number of edges
+    preserving degree sequence."""
+    sample_edges = [i for i in g.edges() if np.random.uniform(0,1) < fraction]
+    g.remove_edges_from(sample_edges)
+    vs, us = list(zip(*sample_edges))
+    vs = list(vs)
+    us = list(us)
+    np.random.shuffle(vs)
+    np.random.shuffle(us)
+    sample_edges = list(zip(vs, us))
+    g.add_edges_from(sample_edges)
+    return g
