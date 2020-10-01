@@ -23,6 +23,19 @@ python b_train_sgf.py --data cora --test_study --cuda
 python b_train_sgf.py --data wisconsin --test_study --cuda
 python b_train_sgf.py --data bipartite --test_study --cuda
 ```
+or train with horizontal stacking
+```bash
+python train_sgfs.py --data cora --test_study --cuda
+python train_sgfs.py --data wisconsin --test_study --cuda
+python train_sgfs.py --data bipartite --test_study --cuda
+```
+or train with edge perturbation
+```bash
+python train_sgf.py --data cora --test_study --cuda --pf 0.9
+python train_sgf.py --data wisconsin --test_study --cuda --pf 0.9
+python train_sgf.py --data bipartite --test_study --cuda --pf 0.9
+```
+
 
 Cora/Citeseer/Pubmed has original split (similar to what used in the GCN paper).
 ```bash
