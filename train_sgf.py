@@ -38,14 +38,21 @@ np.random.seed(args.seed)
 torch.manual_seed(args.seed)
 torch.cuda.manual_seed(args.seed)
 
+# Sklearn can't split this one so we have to use the 
+# default splits
+if args.data in ["cornell", "texas"]:
+    args.split = "0.6"
+
 # Load data
 if args.perturbate_edges > 0.0:
     print("INFO: Perturbate edges")
-    data_package = load_data(args.data, ["AugNormAdj", "SymNormLap"], 
+    data_package = load_data(args.data, 
+                             ["AugNormAdj", "SymNormLap"], 
                              split=args.split, rs=args.seed,
                              pf=args.perturbate_edges)
 else:
-    data_package = load_data(args.data, ["AugNormAdj", "SymNormLap"], 
+    data_package = load_data(args.data, 
+                             ["AugNormAdj", "SymNormLap"], 
                              split=args.split, rs=args.seed)
 
 _, normed_adjs, features, labels, idx_train, idx_val, idx_test = data_package
@@ -55,7 +62,8 @@ if args.use_laplacian:
 
 ### This is only used to print rayleigh loss, not for training!
 ### The training process strictly use only idx_train
-est_rayleigh = rayleigh_sub(labels, L, torch.cat((idx_train, idx_val)), 
+est_rayleigh = rayleigh_sub(labels, L, 
+                            torch.cat((idx_train, idx_val)), 
                             one_hot=True) 
 ######
 
