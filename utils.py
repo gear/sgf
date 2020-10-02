@@ -162,6 +162,6 @@ def perturbate_edges(g, fraction=0.1):
     vs = list(sum(sample_edges, ()))
     np.random.shuffle(vs)
     mid = int(len(vs)/2)
-    sample_edges = list(zip(vs[mid:], us[:mid]))
+    sample_edges = list(zip(vs[mid:], vs[:mid]))
     g.add_edges_from(sample_edges)
     return g
