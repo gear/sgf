@@ -1,7 +1,5 @@
 Source code for SGF. Uses PyTorch.
 
-![Block Diagram of SGF-A](https://github.com/gear/sgf/raw/master/misc/sgf.png)
-
 Create environment:
 ```
 conda install pytorch-gpu networkx scipy scikit-learn
