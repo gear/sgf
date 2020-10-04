@@ -10,10 +10,19 @@ def fetch_normalization(type, **kwargs):
        'InvLap': lambda adj: inv_normalized_laplacian(adj, **kwargs),
        'CombLap': comb_laplacian,
        'SymNormLap': sym_normalized_laplacian,
-       'AbsRwNormAdj': abs_rw_normalized_adjacency
+       'AbsRwNormAdj': abs_rw_normalized_adjacency,
+       'ChebLap': chebynet_laplacian
    }
    func = switcher.get(type, lambda x: x)
    return func
+
+def chebynet_laplacian(adj, l_max=1.5): 
+   adj = sp.coo_matrix(adj)
+   row_sum = np.array(adj.sum(1))
+   d_inv = np.power(row_sum, -1/2).flatten()
+   d_inv[np.isinf(d_inv)] = 0.
+   d_mat_inv = sp.diags(d_inv)
+   return -2/l_max * d_mat_inv.dot(adj).dot(d_mat_inv).tocoo() + (2-l_max)/l_max * sp.eye(adj.shape[0])
 
 def aug_normalized_adjacency(adj):
    adj = adj + sp.eye(adj.shape[0])

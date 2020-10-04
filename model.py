@@ -79,6 +79,8 @@ class ChebNet(nn.Module):
         self.nlayers = nlayers
             
     def forward(self, x, L):
+        x = F.dropout(x, self.dropout, training=self.training)
+        x = self.act_fn(self.fc1(x))
         T_0, poly = self.filters[0](x, None)
         T_1, term = self.filters[1](T_0, None, None)
         poly += term
@@ -88,7 +90,8 @@ class ChebNet(nn.Module):
             prevs[1] = prevs[0]
             prevs[0] = T_i
             poly += term
-        y_hat = self.fc_out(poly)
+        poly = F.dropout(poly, self.dropout, training=self.training)
+        y_hat = self.fc2(poly)
         return F.log_softmax(y_hat, dim=1)
         
 class ChebLayer(nn.Module):
@@ -97,7 +100,7 @@ class ChebLayer(nn.Module):
         self.theta = Parameter(torch.FloatTensor([theta]))
     
     def forward(self, T_n_1, T_n_2, M=None):
-        if M:
+        if M is not None:
             H_l = 2 * torch.spmm(M, T_n_1) 
             H_l = H_l - T_n_2
         else:

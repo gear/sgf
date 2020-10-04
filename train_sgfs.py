@@ -37,6 +37,9 @@ np.random.seed(args.seed)
 torch.manual_seed(args.seed)
 torch.cuda.manual_seed(args.seed)
 
+if args.data in ["cornell", "texas"]:
+    args.split = "0.6"
+
 # Load data
 data_package = load_data(args.data, ["AugNormAdj", "SymNormLap"], 
                          split=args.split, rs=args.seed)
