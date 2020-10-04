@@ -62,6 +62,49 @@ class SGFS(nn.Module):
         return F.log_softmax(y_hat, dim=1)
 
 
+class ChebNet(nn.Module):
+    def __init__(self, nfeat, nlayers, nhidden, nclass, dropout, init_t=0.5):
+        super(ChebNet, self).__init__()
+        assert nlayers >= 2, "Need at least order 2 Chebyshev."
+        self.filters = nn.ModuleList()
+        for _ in range(nlayers):
+            self.filters.append(ChebLayer(init_t))
+        self.fc1 = nn.Linear(nfeat, nhidden)
+        self.fc2 = nn.Linear(nhidden, nclass)
+        self.params1 = list(self.filters.parameters())
+        self.params2 = list(self.fc1.parameters())
+        self.params2.extend(list(self.fc2.parameters()))
+        self.act_fn = nn.ReLU()
+        self.dropout = dropout
+        self.nlayers = nlayers
+            
+    def forward(self, x, L):
+        T_0, poly = self.filters[0](x, None)
+        T_1, term = self.filters[1](T_0, None, None)
+        poly += term
+        prevs = [T_0, T_1]
+        for i, filt in enumerate(self.filters[2:]):
+            T_i, term = filt(prevs[0], prevs[1], L)
+            prevs[1] = prevs[0]
+            prevs[0] = T_i
+            poly += term
+        y_hat = self.fc_out(poly)
+        return F.log_softmax(y_hat, dim=1)
+        
+class ChebLayer(nn.Module):
+    def __init__(self, theta):
+        super(ChebLayer, self).__init__()
+        self.theta = Parameter(torch.FloatTensor([theta]))
+    
+    def forward(self, T_n_1, T_n_2, M=None):
+        if M:
+            H_l = 2 * torch.spmm(M, T_n_1) 
+            H_l = H_l - T_n_2
+        else:
+            H_l = T_n_1
+        return H_l, self.theta * H_l
+        
+
 class GraphFilter(nn.Module):
     def __init__(self, alpha1, alpha2, skip="A"):
         super(GraphFilter, self).__init__()
