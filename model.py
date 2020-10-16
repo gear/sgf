@@ -82,7 +82,7 @@ class ChebNet(nn.Module):
         x = F.dropout(x, self.dropout, training=self.training)
         x = self.act_fn(self.fc1(x))
         T_0, poly = self.filters[0](x, None)
-        T_1, term = self.filters[1](T_0, None, None)
+        T_1, term = self.filters[1](T_0, None, L)
         poly += term
         prevs = [T_0, T_1]
         for i, filt in enumerate(self.filters[2:]):
@@ -100,9 +100,11 @@ class ChebLayer(nn.Module):
         self.theta = Parameter(torch.FloatTensor([theta]))
     
     def forward(self, T_n_1, T_n_2, M=None):
-        if M is not None:
+        if M is not None and T_n_2 is not None:
             H_l = 2 * torch.spmm(M, T_n_1) 
             H_l = H_l - T_n_2
+        elif M is not None and T_n_2 is None:
+            H_l = torch.spmm(M, T_n_1) 
         else:
             H_l = T_n_1
         return H_l, self.theta * H_l
