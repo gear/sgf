@@ -117,6 +117,8 @@ class GraphFilter(nn.Module):
         self.skip = skip
         self.alpha1 = Parameter(torch.FloatTensor([alpha1]))
         self.alpha2 = Parameter(torch.FloatTensor([alpha2]))
+        torch.nn.init.uniform_(self.alpha1, -2, 2)
+        torch.nn.init.uniform_(self.alpha2, -2, 2)
 
     def _skip_from_input(self, inp, M, x):
         H_l = torch.spmm(M, inp)

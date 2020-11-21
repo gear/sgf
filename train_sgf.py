@@ -31,6 +31,7 @@ parser.add_argument('--test_study', action='store_true', default=False, help='pr
 parser.add_argument("--log_period", type=int, default=50, help="Log every x epochs")
 parser.add_argument("--split", type=str, default="0.6_0.2_0.2")
 parser.add_argument("--use_laplacian", action="store_true", default=False)
+parser.add_argument("--analyze_filter", action="store_true", default=False)
 parser.add_argument("--perturbate_edges", type=float, default=0.0)
 args = parser.parse_args()
 random.seed(args.seed)
@@ -159,7 +160,7 @@ def test_study():
     
 t_total = time.time()
 c = 0
-best = 7e7
+best = 0
 best_epoch = 0
 acc = 0
 
@@ -177,8 +178,10 @@ for epoch in range(args.epochs):
             'acc:{:.2f}'.format(acc_val*100),
             ' | ', 
             'f_loss:{:.3f}'.format(loss_filt))
-    if loss_val < best:
-        best = loss_val
+    if args.analyze_filter and epoch % 20 == 0:
+        torch.save(model.state_dict(), "{}_{}.pt".format(checkpt_file[:-3], epoch))
+    if acc_val > best:
+        best = acc_val
         best_epoch = epoch
         acc = acc_val
         torch.save(model.state_dict(), checkpt_file)
