@@ -16,7 +16,7 @@ def fetch_normalization(type, **kwargs):
    func = switcher.get(type, lambda x: x)
    return func
 
-def chebynet_laplacian(adj, l_max=1.5): 
+def chebynet_laplacian(adj, l_max=2.0): 
    adj = sp.coo_matrix(adj)
    row_sum = np.array(adj.sum(1))
    d_inv = np.power(row_sum, -1/2).flatten()
